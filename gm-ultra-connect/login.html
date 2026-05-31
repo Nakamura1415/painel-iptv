@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<title>Login Admin</title>
+
+<style>
+
+body{
+background:#0f0f0f;
+font-family:Arial;
+color:white;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+height:100vh;
+}
+
+.box{
+background:#1b1b1b;
+padding:30px;
+border-radius:15px;
+width:300px;
+}
+
+h1{
+color:gold;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+
+background:gold;
+border:none;
+border-radius:8px;
+
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>GM ULTRA CONNECT</h1>
+
+<input
+id="usuario"
+placeholder="Usuário"
+>
+
+<input
+id="senha"
+type="password"
+placeholder="Senha"
+>
+
+<button onclick="login()">
+Entrar
+</button>
+
+</div>
+
+<script>
+
+function login(){
+
+const usuario =
+document.getElementById("usuario").value;
+
+const senha =
+document.getElementById("senha").value;
+
+if(usuario === "admin" && senha === "123456"){
+
+window.location.href = "index.html";
+
+}else{
+
+alert("Usuário ou senha incorretos!");
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

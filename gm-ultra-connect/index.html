@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GM ULTRA CONNECT</title>
+
+  <style>
+
+    body{
+      background:#0f0f0f;
+      color:white;
+      font-family:Arial;
+      padding:20px;
+    }
+
+    h1{
+      color:gold;
+    }
+
+    form{
+      display:flex;
+      flex-direction:column;
+      width:300px;
+      gap:10px;
+    }
+
+    input{
+      padding:10px;
+      border:none;
+      border-radius:5px;
+    }
+
+    button{
+      padding:10px;
+      background:gold;
+      border:none;
+      border-radius:5px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+.topo{
+margin-bottom:30px;
+}
+
+.topo h1{
+color:gold;
+font-size:52px;
+margin-bottom:5px;
+}
+
+.topo p{
+color:#999;
+font-size:18px;
+margin-top:0;
+}
+
+.form-card{
+background:#1b1b1b;
+padding:20px;
+transition:0.3s;
+border:1px solid #2a2a2a;
+border-radius:15px;
+width:330px;
+box-shadow:0 0 15px rgba(0,0,0,0.4);
+margin-bottom:20px;
+}
+
+.form-card:hover{
+transform:translateY(-5px);
+box-shadow:0 0 15px rgba(255,215,0,0.2);
+}
+
+   #lista-clientes{
+margin-top:30px;
+
+display:grid;
+grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+gap:20px;
+}
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="topo">
+  <h1>GM ULTRA CONNECT</h1>
+  <p>Painel Administrativo de Clientes</p>
+</div>
+
+ <form id="form-cliente" class="form-card">
+
+  
+   <input type="text" id="nome" placeholder="Nome do cliente">
+
+<input type="text" id="telefone" placeholder="Telefone">
+
+<input type="text" id="login" placeholder="Login">
+
+<input type="text" id="senha" placeholder="Senha">
+<input type="date" id="vencimento">
+
+    <button>
+      Cadastrar Cliente
+    </button>
+
+  </form>
+
+  <div class="form-card">
+  <h2 style="color:gold;margin-top:0;">Importar clientes IPTV</h2>
+
+  <input
+    type="file"
+    id="arquivoExcel"
+    accept=".xls,.xlsx"
+  >
+
+  <button onclick="importarExcel()" style="margin-top:15px;">
+    Importar Planilha
+  </button>
+</div>
+
+<div class="form-card">
+  <h2 style="color:gold;margin-top:0;">Planos de Renovação</h2>
+
+  <input type="text" id="planoMensal" placeholder="Mensal R$25">
+
+ <input type="text" id="planoSemestral" placeholder="Semestral R$135">
+
+  <input type="text" id="planoAnual" placeholder="Anual R$250">
+
+  <button onclick="salvarPlanos()" style="margin-top:15px;">
+    Salvar Planos
+  </button>
+
+  <br><br>
+
+<button onclick="gerarCheckout()" style="
+background: linear-gradient(135deg,#00c853,#00e676);
+color:white;
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+width:100%;
+margin-top:15px;
+box-shadow:0 0 15px rgba(0,255,120,0.4);
+transition:0.3s;
+">
+💳 PAGAR / RENOVAR PLANO
+</button>
+
+<div id="pixResultado" style="margin-top:15px;"></div>
+
+</div>
+
+  <div id="dashboard" style="
+  display:flex;
+  gap:15px;
+  margin:20px 0;
+">
+  <div style="background:#1b1b1b;padding:15px;border-radius:10px;">
+    Total: <strong id="total-clientes">0</strong>
+  </div>
+
+  <div style="background:#003b16;padding:15px;border-radius:10px;">
+    Ativos: <strong id="clientes-ativos">0</strong>
+  </div>
+
+  <div style="background:#5c0000;padding:15px;border-radius:10px;">
+    Vencidos: <strong id="clientes-vencidos">0</strong>
+  </div>
+</div>
+  <input
+  id="pesquisa"
+  placeholder="Pesquisar cliente..."
+  style="
+    width:300px;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    margin-bottom:20px;
+    font-size:16px;
+  "
+  oninput="carregarClientes()"
+/>
+  <div id="lista-clientes">
+    Clientes aparecerão aqui
+  </div>
+
+<script>
+  const form = document.getElementById("form-cliente");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const cliente = {
+      nome: document.getElementById("nome").value,
+      telefone: document.getElementById("telefone").value,
+      login: document.getElementById("login").value,
+      senha: document.getElementById("senha").value,
+      status: "ativo",
+      vencimento: document.getElementById("vencimento").value
+    };
+
+    await fetch("http://localhost:3000/cliente", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(cliente)
+    });
+
+    alert("Cliente cadastrado com sucesso!");
+    form.reset();
+    carregarClientes();
+  });
+
+async function carregarClientes() {
+  const resposta = await fetch("http://localhost:3000/clientes");
+  const clientes = await resposta.json();
+
+  const totalClientes = clientes.length;
+
+const clientesAtivos = clientes.filter(cliente =>
+new Date(cliente.vencimento) >= new Date()
+).length;
+
+const clientesVencidos = clientes.filter(cliente =>
+new Date(cliente.vencimento) < new Date()
+).length;
+
+document.getElementById("total-clientes").innerText = totalClientes;
+
+document.getElementById("clientes-ativos").innerText = clientesAtivos;
+
+document.getElementById("clientes-vencidos").innerText = clientesVencidos;
+  
+  const pesquisa = document
+.getElementById("pesquisa")
+.value
+.toLowerCase();
+
+  const lista = document.getElementById("lista-clientes");
+
+  lista.innerHTML = clientes
+.filter(cliente =>
+(cliente.nome || '').toLowerCase().includes(pesquisa) ||
+(cliente.telefone || '').includes(pesquisa)
+)
+.map(cliente => {
+    
+  const vencido = new Date(cliente.vencimento) < new Date();
+
+    return `
+      <div style="
+        background:${vencido ? '#5c0000' : '#1b1b1b'};
+        padding:15px;
+        border-radius:10px;
+        margin-bottom:15px;
+        box-shadow:0 0 10px rgba(0,0,0,0.4);
+transition:0.3s;
+border:1px solid ${vencido ? '#ff0000' : '#2a2a2a'};
+      ">
+       <h2 style="margin:0;color:gold;">${cliente.nome || "Cliente sem nome"}</h2>
+
+<p><strong>Telefone:</strong> ${cliente.telefone || "Não informado"}</p>
+<p><strong>Login:</strong> ${cliente.login || "Não informado"}</p>
+<p><strong>Senha:</strong> ${cliente.senha || "Não informado"}</p>
+<p><strong>Vencimento:</strong> ${new Date(cliente.vencimento).toLocaleDateString("pt-BR")}</p>
+
+<span style="
+display:inline-block;
+padding:6px 12px;
+border-radius:20px;
+background:${vencido ? '#ff0000' : '#008000'};
+font-weight:bold;
+margin-bottom:15px;
+">
+${vencido ? "VENCIDO" : "ATIVO"}
+</span>
+      <br><br>
+<a 
+ href="https://wa.me/55${cliente.telefone}?text=Olá ${cliente.nome}, seu acesso GM ULTRA CONNECT vence em ${new Date(cliente.vencimento).toLocaleDateString('pt-BR')}. Evite bloqueio realizando sua renovação."
+  target="_blank"
+  style="
+    background:#25D366;
+    color:white;
+    padding:10px 15px;
+    border-radius:8px;
+    text-decoration:none;
+    display:inline-block;
+    font-weight:bold;
+  "
+>
+  Chamar no WhatsApp
+  </a>
+
+<br><br>
+
+<button
+<br><br>
+
+<br><br>
+
+<button
+onclick="gerarCheckoutCliente('${cliente._id}', '${cliente.nome}', '${cliente.telefone}')"
+style="
+background:#00c853;
+color:white;
+padding:10px 15px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+"
+>
+💳 Renovar com Pagamento
+</button>
+
+<br><br>
+
+<button
+onclick="editarCliente('${cliente._id}')"
+style="
+background:#0099ff;
+color:white;
+padding:10px 15px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+"
+>
+Editar Cliente
+</button>
+<br><br>
+
+<button
+onclick="deletarCliente('${cliente._id}')"
+style="
+background:red;
+color:white;
+padding:10px 15px;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+"
+>
+Excluir Cliente
+</button>
+
+</div>
+`;
+}).join("");
+}
+async function renovarCliente(id) {
+
+await fetch(`http://localhost:3000/clientes/${id}/renovar`, {
+method: "PUT"
+});
+
+alert("Cliente renovado!");
+
+carregarClientes();
+
+}
+async function editarCliente(id) {
+
+const novoNome = prompt("Novo nome:");
+const novoTelefone = prompt("Novo telefone:");
+const novoLogin = prompt("Novo login:");
+const novaSenha = prompt("Nova senha:");
+const novoVencimento = prompt("Novo vencimento:");
+
+await fetch(`http://localhost:3000/clientes/${id}`, {
+
+method: "PUT",
+
+headers: {
+"Content-Type": "application/json"
+},
+
+body: JSON.stringify({
+nome: novoNome,
+telefone: novoTelefone,
+login: novoLogin,
+senha: novaSenha,
+vencimento: novoVencimento
+})
+
+});
+
+alert("Cliente atualizado!");
+
+carregarClientes();
+
+}
+
+async function deletarCliente(id) {
+
+const confirmar = confirm("Deseja excluir este cliente?");
+
+if (!confirmar) return;
+
+await fetch(`http://localhost:3000/clientes/${id}`, {
+method: "DELETE"
+});
+
+alert("Cliente excluído!");
+
+carregarClientes();
+
+}
+
+async function importarExcel() {
+
+const arquivo = document.getElementById("arquivoExcel").files[0];
+
+if (!arquivo) {
+
+alert("Escolha uma planilha");
+
+return;
+
+}
+
+const formData = new FormData();
+
+formData.append("arquivo", arquivo);
+
+const resposta = await fetch("http://localhost:3000/importar", {
+
+method: "POST",
+
+body: formData
+
+});
+
+const resultado = await resposta.text();
+
+alert(resultado);
+
+carregarClientes();
+
+}
+
+carregarClientes();
+
+function salvarPlanos() {
+
+const mensal = document.getElementById("planoMensal").value;
+
+const semestral = document.getElementById("planoSemestral").value;
+
+const anual = document.getElementById("planoAnual").value;
+
+localStorage.setItem("planoMensal", mensal);
+
+localStorage.setItem("planoSemestral", semestral);
+
+localStorage.setItem("planoAnual", anual);
+
+alert("Planos salvos com sucesso!");
+
+}
+
+document.getElementById("planoMensal").value =
+localStorage.getItem("planoMensal") || "";
+
+document.getElementById("planoSemestral").value =
+localStorage.getItem("planoSemestral") || "";
+
+document.getElementById("planoAnual").value =
+localStorage.getItem("planoAnual") || "";
+
+async function gerarCheckout() {
+
+  const valorTexto = document.getElementById("planoMensal").value;
+
+  const valorLimpo = valorTexto
+    .replace("Mensal", "")
+    .replace("R$", "")
+    .replace(":", "")
+    .replace(",", ".")
+    .trim();
+
+  const valorFinal = Number(valorLimpo);
+
+  if (!valorFinal || valorFinal <= 0) {
+    alert("Valor do plano mensal inválido");
+    return;
+  }
+
+  const resposta = await fetch("http://localhost:3000/criar-checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      valor: valorFinal,
+      descricao: "Plano Mensal GM ULTRA CONNECT"
+    })
+  });
+
+  const dados = await resposta.json();
+
+  window.open(dados.link, "_blank");
+}
+async function gerarCheckoutCliente(id, nome, telefone) {
+
+  const valorTexto = document.getElementById("planoMensal").value;
+
+  const valorLimpo = valorTexto
+    .replace("Mensal", "")
+    .replace("R$", "")
+    .replace(":", "")
+    .replace(",", ".")
+    .trim();
+
+  const valorFinal = Number(valorLimpo);
+
+  if (!valorFinal || valorFinal <= 0) {
+    alert("Valor inválido");
+    return;
+  }
+
+  const resposta = await fetch("http://localhost:3000/criar-checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      clienteId: id,
+      nome: nome,
+      telefone: telefone,
+      valor: valorFinal,
+      descricao: "Renovação GM ULTRA CONNECT - " + nome
+    })
+  });
+
+  const dados = await resposta.json();
+
+  window.open(dados.link, "_blank");
+}
+</script>
+
+</body>
