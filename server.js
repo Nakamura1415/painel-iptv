@@ -9,6 +9,8 @@ const { MercadoPagoConfig, Payment, Preference } = require("mercadopago");
 
 const app = express();
 
+app.use(express.static(__dirname + "/gm-ultra-connect"));
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
@@ -17,7 +19,7 @@ app.use(cors());
 const upload = multer({ dest: "uploads/" });
 
 const client = new MercadoPagoConfig({
- accessToken: "APP_USR-6257102166038584-052718-13bec40e6d81579d8ca6a2bc9c1f52c7-3257151693"
+accessToken: "APP_USR-6257102166038584-052718-13bec40e6d81579d8ca6a2bc9c1f52c7-3257151693"
 });
 
 const payment = new Payment(client);
@@ -338,10 +340,13 @@ app.post("/criar-checkout", async (req, res) => {
             currency_id: "BRL"
           }
         ],
+
+        external_reference: req.body.telefone,
+        
         payment_methods: {
           installments: 12
         },
-notification_url: process.env.WEBHOOK_URL
+notification_url: "https://drives-need-effort-likewise.trycloudflare.com/webhook",
      }
     });
 
@@ -357,6 +362,12 @@ notification_url: process.env.WEBHOOK_URL
 });
 
 const PORT = process.env.PORT || 3000;
+
+app.use(express.static(__dirname + "/gm-ultra-connect"));
+
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/gm-ultra-connect/index.html");
+});
 
 app.listen(PORT, () => {
   console.log("Servidor rodando na porta " + PORT);
