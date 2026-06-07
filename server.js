@@ -29,7 +29,7 @@ const preference = new Preference(client);
 const PORT = process.env.PORT || 3000;
 
 // conexão com banco
-mongoose.connect(process.env.MONGO_URL, {
+mongoose.connect("mongodb://mongo:wOCwzpzGcCdqKuRSLjokaUUzwMMOAfJP@mongodb.railway.internal:27017", {
   serverSelectionTimeoutMS: 30000
 })
 .then(() => {
@@ -38,6 +38,7 @@ mongoose.connect(process.env.MONGO_URL, {
   app.listen(PORT, () => {
     console.log("Servidor rodando na porta " + PORT);
   });
+
 })
 .catch((err) => {
   console.error("ERRO MONGO:", err);
