@@ -26,16 +26,23 @@ const payment = new Payment(client);
 
 const preference = new Preference(client);
 
+const PORT = process.env.PORT || 3000;
+
 // conexão com banco
 mongoose.connect(process.env.MONGO_URL, {
   serverSelectionTimeoutMS: 30000
 })
 .then(() => {
   console.log("MongoDB conectado");
+
+  app.listen(PORT, () => {
+    console.log("Servidor rodando na porta " + PORT);
+  });
 })
 .catch((err) => {
   console.error("ERRO MONGO:", err);
 });
+
 
 // modelo cliente
 const Cliente = mongoose.model("Cliente", {
@@ -375,6 +382,3 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/gm-ultra-connect/index.html");
 });
 
-app.listen(PORT, () => {
-  console.log("Servidor rodando na porta " + PORT);
-});
