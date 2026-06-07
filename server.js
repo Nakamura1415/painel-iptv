@@ -27,9 +27,15 @@ const payment = new Payment(client);
 const preference = new Preference(client);
 
 // conexão com banco
-mongoose.connect("mongodb://127.0.0.1:27017/iptv")
-.then(() => console.log("MongoDB conectado"))
-.catch((err) => console.log(err));
+mongoose.connect(process.env.MONGO_URL, {
+  serverSelectionTimeoutMS: 30000
+})
+.then(() => {
+  console.log("MongoDB conectado");
+})
+.catch((err) => {
+  console.error("ERRO MONGO:", err);
+});
 
 // modelo cliente
 const Cliente = mongoose.model("Cliente", {
