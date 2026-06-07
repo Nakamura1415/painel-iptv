@@ -117,29 +117,7 @@ gap:20px;
     id="arquivoExcel"
     accept=".xls,.xlsx"
   >
-async function importarExcel() {
-  const input = document.querySelector('input[type="file"]');
 
-  if (!input.files.length) {
-    alert("Escolha uma planilha primeiro.");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("arquivo", input.files[0]);
-
-  const resposta = await fetch("https://painel-iptv-production.up.railway.app/importar", {
-    method: "POST",
-    body: formData
-  });
-
-  if (resposta.ok) {
-    alert("Planilha importada com sucesso!");
-    carregarClientes();
-  } else {
-    alert("Erro ao importar planilha.");
-  }
-}
   <button onclick="importarExcel()" style="margin-top:15px;">
     Importar Planilha
   </button>
@@ -217,7 +195,29 @@ transition:0.3s;
 
 <script>
   const form = document.getElementById("form-cliente");
+async function importarExcel() {
+  const input = document.querySelector('input[type="file"]');
 
+  if (!input.files.length) {
+    alert("Escolha uma planilha primeiro.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("arquivo", input.files[0]);
+
+  const resposta = await fetch("https://painel-iptv-production.up.railway.app/importar", {
+    method: "POST",
+    body: formData
+  });
+
+  if (resposta.ok) {
+    alert("Planilha importada com sucesso!");
+    carregarClientes();
+  } else {
+    alert("Erro ao importar planilha.");
+  }
+}
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
