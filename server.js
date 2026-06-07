@@ -374,8 +374,6 @@ notification_url: "https://drives-need-effort-likewise.trycloudflare.com/webhook
 
 });
 
-const PORT = process.env.PORT || 3000;
-
 app.use(express.static(__dirname + "/gm-ultra-connect"));
 
 app.get("/", (req, res) => {
