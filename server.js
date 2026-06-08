@@ -161,32 +161,37 @@ return new Date(dataTexto);
 }
 
 app.post("/importar", upload.single("arquivo"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send("Nenhum arquivo enviado");
+    }
 
-const workbook = XLSX.readFile(req.file.path);
+    const workbook = XLSX.readFile(req.file.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const dados = XLSX.utils.sheet_to_json(sheet);
 
-const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    let total = 0;
 
-const dados = XLSX.utils.sheet_to_json(sheet);
+    for (const item of dados) {
+      await Cliente.create({
+        nome: item["Notas"] || item["Nome"] || item["nome"] || "Cliente sem nome",
+        telefone: String(item["Número"] || item["Telefone"] || item["telefone"] || "").replace(".0", ""),
+        login: item["Usuário"] || item["Usuario"] || item["Login"] || item["login"] || "",
+        senha: item["Senha"] || item["senha"] || "",
+        status: item["Status"] || "ativo",
+        vencimento: converterData(item["Vencimento"] || item["vencimento"])
+      });
 
-for (const item of dados) {
+      total++;
+    }
 
-await Cliente.create({
-
-nome: item["Notas"] || "Cliente sem nome",
-
-telefone: String(item["Número"] || "").replace(".0", ""),
-
-login: item["Usuário"] || "",
-
-senha: item["Senha"] || "",
-
-status: item["Status"] || "",
-
-vencimento: converterData(item["Vencimento"])
-
+    res.json({ mensagem: "Planilha importada com sucesso", total });
+  } catch (erro) {
+    console.error("ERRO IMPORTAR:", erro);
+    res.status(500).send("Erro ao importar planilha");
+  }
 });
 
-}
 
 res.send("Clientes importados com sucesso");
 
