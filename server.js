@@ -193,10 +193,6 @@ app.post("/importar", upload.single("arquivo"), async (req, res) => {
 });
 
 
-res.send("Clientes importados com sucesso");
-
-});
-
 app.use(express.static(__dirname));
 
 app.get("/clientes-duplicados", async (req, res) => {
