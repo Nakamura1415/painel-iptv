@@ -71,7 +71,7 @@ const Pagamento = mongoose.model("Pagamento", {
 });
 
 // rota criar cliente
-app.post("/cliente", async (req, res) => {
+app.post("/clientes", async (req, res) => {
   const cliente = new Cliente(req.body);
   await cliente.save();
   res.send("Cliente criado com sucesso");
