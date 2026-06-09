@@ -451,7 +451,7 @@ const confirmar = confirm("Deseja excluir este cliente?");
 
 if (!confirmar) return;
 
-await fetch(`http://localhost:3000/clientes/${id}`, {
+await fetch(`https://painel-iptv-production.up.railway.app/clientes/${id}`, {
 method: "DELETE"
 });
 
@@ -477,7 +477,7 @@ const formData = new FormData();
 
 formData.append("arquivo", arquivo);
 
-const resposta = await fetch("http://localhost:3000/importar", {
+const resposta = await fetch("https://painel-iptv-production.up.railway.app/importar", {
 
 method: "POST",
 
@@ -540,7 +540,7 @@ async function gerarCheckout() {
     return;
   }
 
-  const resposta = await fetch("http://localhost:3000/criar-checkout", {
+  const resposta = await fetch("https://painel-iptv-production.up.railway.app/criar-checkout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
