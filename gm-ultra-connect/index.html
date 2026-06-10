@@ -573,7 +573,7 @@ async function gerarCheckoutCliente(id, nome, telefone) {
     return;
   }
 
-  const resposta = await fetch("http://localhost:3000/criar-checkout", {
+  const resposta = await fetch("https://painel-iptv-production.up.railway.app/criar-checkout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
