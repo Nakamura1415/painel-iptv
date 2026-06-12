@@ -557,21 +557,27 @@ async function gerarCheckout() {
 }
 async function gerarCheckoutCliente(id, nome, telefone) {
 
-  const valorTexto = document.getElementById("planoMensal").value;
+const escolha = prompt(
+"Escolha o plano:\n\n1 - Mensal R$25\n2 - Semestral R$135\n3 - Anual R$250"
+);
 
-  const valorLimpo = valorTexto
-    .replace("Mensal", "")
-    .replace("R$", "")
-    .replace(":", "")
-    .replace(",", ".")
-    .trim();
+let valorFinal = 25;
+let descricaoPlano = "Plano Mensal GM ULTRA CONNECT";
 
-  const valorFinal = Number(valorLimpo);
+if (escolha === "2") {
+  valorFinal = 135;
+  descricaoPlano = "Plano Semestral GM ULTRA CONNECT";
+}
 
-  if (!valorFinal || valorFinal <= 0) {
-    alert("Valor inválido");
-    return;
-  }
+if (escolha === "3") {
+  valorFinal = 250;
+  descricaoPlano = "Plano Anual GM ULTRA CONNECT";
+}
+
+if (!["1", "2", "3"].includes(escolha)) {
+  alert("Plano inválido");
+  return;
+}
 
   const resposta = await fetch("https://painel-iptv-production.up.railway.app/criar-checkout", {
     method: "POST",
@@ -583,7 +589,7 @@ async function gerarCheckoutCliente(id, nome, telefone) {
       nome: nome,
       telefone: telefone,
       valor: valorFinal,
-      descricao: "Renovação GM ULTRA CONNECT - " + nome
+     descricao: descricaoPlano
     })
   });
 
