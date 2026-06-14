@@ -304,9 +304,21 @@ app.post("/webhook", async (req, res) => {
         ? vencimentoAtual
         : hoje;
 
-    baseRenovacao.setDate(
-      baseRenovacao.getDate() + 30
-    );
+   let diasRenovacao = 30;
+
+const valorPago = Number(pagamentoInfo.transaction_amount);
+
+if (valorPago === 135) {
+    diasRenovacao = 180;
+}
+
+if (valorPago === 250) {
+    diasRenovacao = 365;
+}
+
+baseRenovacao.setDate(
+    baseRenovacao.getDate() + diasRenovacao
+);
 
     cliente.vencimento = baseRenovacao;
 
