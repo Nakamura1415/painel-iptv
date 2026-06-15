@@ -373,7 +373,7 @@ app.post("/criar-checkout", async (req, res) => {
         payment_methods: {
           installments: 12
         },
-notification_url: "https://drives-need-effort-likewise.trycloudflare.com/webhook",
+notification_url: "https://painel-iptv-production.up.railway.app/webhook",
      }
     });
 
